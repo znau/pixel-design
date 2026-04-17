@@ -6,6 +6,8 @@
 
 A complete web-based RGB matrix design tool supporting real-time editing, multi-format export, and remote data push capabilities.
 
+Demo: [https://znau.github.io/pixel-design/index.html](https://znau.github.io/pixel-design/index.html)
+
 ## ✨ Core Features
 
 ### 📐 Grid Editing

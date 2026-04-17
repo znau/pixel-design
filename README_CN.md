@@ -8,6 +8,8 @@
 
 一个功能完整的Web型RGB点阵屏设计工具，支持实时编辑、多格式导出和远程推送。
 
+演示: [https://znau.github.io/pixel-design/index.html](https://znau.github.io/pixel-design/index.html)
+
 ## ✨ 核心功能
 
 ### 📐 网格编辑
