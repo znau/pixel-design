@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RGB点阵屏设计工具</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <div class="header-top">
+                <h1 id="appTitle" data-i18n="appTitle">🎨 RGB Matrix Design Tool</h1>
+                <div class="language-selector">
+                    <select id="languageSelect" class="lang-select">
+                        <option value="en" selected>English</option>
+                        <option value="zh">中文</option>
+                    </select>
+                </div>
+            </div>
+            <div class="header-controls">
+                <div class="size-selector">
+                    <label for="gridWidth" data-i18n="widthLabel">Width:</label>
+                    <input type="number" id="gridWidth" min="1" max="32" value="8">
+                    <label for="gridHeight" data-i18n="heightLabel">Height:</label>
+                    <input type="number" id="gridHeight" min="1" max="32" value="8">
+                    <button id="applyGridSize" data-i18n="applyBtn">Apply</button>
+                </div>
+                
+                <div class="zoom-controls">
+                    <button id="zoomOut" title="缩小" class="zoom-btn">🔍−</button>
+                    <div class="zoom-slider-container">
+                        <input type="range" id="zoomSlider" min="10" max="200" value="100" title="缩放网格">
+                        <span id="zoomValue">100%</span>
+                    </div>
+                    <button id="zoomIn" title="放大" class="zoom-btn">🔍+</button>
+                    <button id="zoomReset" title="重置" class="zoom-btn">🔍↺</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- 左侧工具栏 -->
+            <aside class="toolbar">
+                <section class="tool-section">
+                    <h3 data-i18n="toolsTitle">Tools</h3>
+                    <div class="tool-buttons">
+                        <button class="tool-btn active" data-tool="draw" title="Draw" data-i18n="drawTool">✏️ Draw</button>
+                        <button class="tool-btn" data-tool="fill" title="Fill" data-i18n="fillTool">🪣 Fill</button>
+                        <button class="tool-btn" data-tool="eyedropper" title="Color" data-i18n="colorPickerTool">🔍 Color</button>
+                        <button class="tool-btn" data-tool="eraser" title="Erase" data-i18n="eraserTool">⬜ Erase</button>
+                    </div>
+                </section>
+
+                <section class="tool-section">
+                    <h3 data-i18n="editTitle">Edit</h3>
+                    <div class="edit-buttons">
+                        <button id="undoBtn" title="Undo" data-i18n="undoBtn">↶ Undo</button>
+                        <button id="redoBtn" title="Redo" data-i18n="redoBtn">↷ Redo</button>
+                        <button id="clearBtn" title="Clear Canvas" data-i18n="clearBtn">🗑️ Clear</button>
+                        <button id="invertBtn" title="Invert" data-i18n="invertBtn">🔄 Invert</button>
+                    </div>
+                </section>
+
+                <section class="tool-section">
+                    <h3 data-i18n="colorPickerTitle">Color Picker</h3>
+                    <div class="color-picker-wrapper">
+                        <input type="color" id="colorPicker" value="#FF0000" title="Click to select color" data-i18n="colorPickerInput">
+                        <!-- <div class="color-display" id="colorDisplay" style="background-color: #FF0000;"></div>-->
+                        
+                        <!-- HEX -->
+                        <div class="color-input-group">
+                            <label for="hexInput" data-i18n="hexLabel">HEX:</label>
+                            <input type="text" id="hexInput" class="color-input" value="FF0000" placeholder="#RRGGBB">
+                        </div>
+
+                        <!-- RGB -->
+                        <div class="color-input-group">
+                            <label data-i18n="rgbLabel">RGB:</label>
+                            <div class="color-inputs-row">
+                                <input type="number" id="rgbR" class="color-input-mini" min="0" max="255" value="255">
+                                <input type="number" id="rgbG" class="color-input-mini" min="0" max="255" value="0">
+                                <input type="number" id="rgbB" class="color-input-mini" min="0" max="255" value="0">
+                            </div>
+                        </div>
+
+                        <!-- CMYK -->
+                        <div class="color-input-group">
+                            <label data-i18n="cmykLabel">CMYK:</label>
+                            <div class="color-inputs-row">
+                                <input type="number" id="cmykC" class="color-input-mini" min="0" max="100" value="0">
+                                <input type="number" id="cmykM" class="color-input-mini" min="0" max="100" value="100">
+                                <input type="number" id="cmykY" class="color-input-mini" min="0" max="100" value="100">
+                                <input type="number" id="cmykK" class="color-input-mini" min="0" max="100" value="0">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="tool-section">
+                    <h3 data-i18n="quickColorsTitle">Quick Colors</h3>
+                    <div class="quick-colors" id="quickColors"></div>
+                </section>
+
+                <section class="tool-section">
+                    <h3 data-i18n="recentColorsTitle">Recent Colors</h3>
+                    <div class="recent-colors" id="recentColors"></div>
+                </section>
+
+                <section class="tool-section">
+                    <h3 data-i18n="exportTitle">Export Data</h3>
+                    <div class="export-buttons">
+                        <button id="exportJSON" title="Export as JSON" data-i18n="exportJSON">📋 JSON</button>
+                        <button id="exportC" title="Export as C Array" data-i18n="exportC">🔧 C Array</button>
+                        <button id="exportHex" title="Export as Hexadecimal" data-i18n="exportHex">💾 HEX</button>
+                        <button id="importJSON" title="Import JSON Data" data-i18n="importBtn">📥 Import</button>
+                    </div>
+                </section>
+
+                <section class="tool-section">
+                    <button id="pushDataBtn" class="section-action-btn" title="Push data to server (Ctrl+U)" data-i18n="pushDataBtn">🚀 Push Data</button>
+                </section>
+
+                <section class="tool-section">
+                    <button id="helpBtn" class="section-action-btn" title="View help and keyboard shortcuts (Ctrl+H)" data-i18n="helpBtn">❓ Help & Shortcuts</button>
+                </section>
+            </aside>
+
+            <!-- 中心画布 -->
+            <main class="canvas-area">
+                <div class="canvas-wrapper">
+                    <div class="grid-axis-container">
+                        <!-- X轴标签（顶部） -->
+                        <div class="x-axis" id="xAxis"></div>
+                        
+                        <!-- 网格和Y轴 -->
+                        <div class="grid-with-y-axis">
+                            <!-- Y轴标签 -->
+                            <div class="y-axis" id="yAxis"></div>
+                            <!-- 网格 -->
+                            <div class="grid-container" id="gridContainer"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="canvas-info">
+                    <span data-i18n="resolutionLabel">Resolution:</span> <span id="resolutionInfo">8x8</span> | 
+                    <span data-i18n="pixelsLabel">Filled Pixels:</span> <span id="pixelCount">0</span> / <span id="totalPixels">64</span>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- 导入对话框 -->
+    <div id="importModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 data-i18n="importModalTitle">Import Design Data</h2>
+                <button class="close-btn" data-modal="importModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <textarea id="importText" placeholder="Paste JSON or hex data..." data-i18n="importPlaceholder"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button id="importConfirm" class="btn-primary" data-i18n="importConfirm">Import</button>
+                <button id="importCancel" class="btn-secondary" data-modal="importModal" data-i18n="importCancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 推送对话框 -->
+    <div id="pushModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 data-i18n="pushModalTitle">Push Data</h2>
+                <button class="close-btn" data-modal="pushModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="push-section">
+                    <div class="push-method-selector">
+                        <label for="pushMethod" data-i18n="pushMethodLabel">Push Method:</label>
+                        <select id="pushMethod" title="Select push method">
+                            <option value="http">HTTP POST</option>
+                            <option value="websocket" disabled>WebSocket (Under Development)</option>
+                            <option value="mqtt" disabled>MQTT (Under Development)</option>
+                        </select>
+                    </div>
+                    <div class="push-url-container">
+                        <label for="pushUrl" data-i18n="pushUrlLabel">URL Address:</label>
+                        <input type="text" id="pushUrl" class="push-input" placeholder="http://example.com/api" title="Enter receiver URL (Ctrl+U to quick open)">
+                    </div>
+                    <button id="pushBtn" class="push-button" title="Push JSON data" data-i18n="pushBtn">🚀 Push Now</button>
+                    <div id="pushStatus" class="push-status"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="closeModal" class="btn-secondary" data-modal="pushModal" data-i18n="closeBtn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 帮助&快捷键对话框 -->
+    <div id="helpModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 data-i18n="helpTitle">Help & Keyboard Shortcuts</h2>
+                <button class="close-btn" data-modal="helpModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="help-content">
+                    <h3 data-i18n="shortcutsTitle">⌨️ Keyboard Shortcuts</h3>
+                    <div class="shortcuts-grid">
+                        <div class="shortcut-item">
+                            <kbd>Ctrl+Z</kbd>
+                            <span data-i18n="sc_undo">Undo</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Ctrl+Y</kbd>
+                            <span data-i18n="sc_redo">Redo</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Ctrl+C</kbd>
+                            <span data-i18n="sc_clear">Clear Canvas</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Ctrl+I</kbd>
+                            <span data-i18n="sc_invert">Invert Colors</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Ctrl+E</kbd>
+                            <span data-i18n="sc_eyedropper">Color Picker</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Ctrl+U</kbd>
+                            <span data-i18n="sc_push">Open Push</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Ctrl+H</kbd>
+                            <span data-i18n="sc_help">Help Menu</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Esc</kbd>
+                            <span data-i18n="sc_cancel">Cancel Fill</span>
+                        </div>
+                    </div>
+
+                    <h3 data-i18n="tipsTitle">💡 Usage Tips</h3>
+                    <ul class="tips-list" id="tipsList">
+                    </ul>
+
+                    <h3 data-i18n="exportFormatsTitle">📋 Export Formats</h3>
+                    <ul class="tips-list" id="formatsList">
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="closeHelpModal" class="btn-secondary" data-modal="helpModal" data-i18n="closeBtn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
